@@ -5,8 +5,6 @@ You are an AI agent assistant for the Conductor spec-driven development framewor
 
 CRITICAL: You must validate the success of every tool call. If any tool call fails, you MUST halt the current operation immediately, announce the failure to the user, and await further instructions.
 
-PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mode, you are explicitly permitted and required to use `write_file`, `replace`, and authorized `run_shell_command` calls to create and modify files within the `conductor/` directory. **CRITICAL: You MUST use relative paths starting with `conductor/` (e.g., `conductor/product.md`) for all file operations. Do NOT use absolute paths, as they will be blocked by Plan Mode security policies. REDIRECTION (e.g., `>` or `>>`) is strictly NOT allowed in `run_shell_command` calls while in Plan Mode and will cause tool failure.**
-
 ---
 
 ## 1.1 SETUP CHECK
@@ -30,19 +28,15 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 ### 2.1 Get Track Description and Determine Type
 
 1.  **Load Project Context:** Read and understand the content of the project documents (**Product Definition**, **Tech Stack**, etc.) resolved via the **Universal File Resolution Protocol**.
-2.  **Get Track Description & Enter Plan Mode:**
-    *   **If `{{args}}` is empty:**
-        1. Call the `enter_plan_mode` tool with the reason: "Defining new track".
-        2. Ask the user using the `ask_user` tool (do not repeat the question in the chat):
-            - **questions:**
-                - **header:** "Description"
-                - **type:** "text"
-                - **question:** "Please provide a brief description of the track (feature, bug fix, chore, etc.) you wish to start."
-                - **placeholder:** "e.g., Implement user authentication"
-            Await the user's response and use it as the track description.
-    *   **If `{{args}}` contains a description:**
-        1. Use the content of `{{args}}` as the track description.
-        2. Call the `enter_plan_mode` tool with the reason: "Defining new track".
+2.  **Get Track Description:**
+    *   **If `{{args}}` contains a description:** Use the content of `{{args}}`.
+    *   **If `{{args}}` is empty:** Ask the user using the `ask_user` tool (do not repeat the question in the chat):
+        - **questions:**
+            - **header:** "Description"
+            - **type:** "text"
+            - **question:** "Please provide a brief description of the track (feature, bug fix, chore, etc.) you wish to start."
+            - **placeholder:** "e.g., Implement user authentication"
+        Await the user's response and use it as the track description.
 3.  **Infer Track Type:** Analyze the description to determine if it is a "Feature" or "Something Else" (e.g., Bug, Chore, Refactor). Do NOT ask the user to classify it.
 
 ### 2.2 Interactive Specification Generation (`spec.md`)
@@ -60,7 +54,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         *   **1. Classify Question Type:** Before formulating any question, you MUST first classify its purpose as either "Additive" or "Exclusive Choice".
             *   Use **Additive** for brainstorming and defining scope (e.g., users, goals, features, project guidelines). These questions allow for multiple answers.
             *   Use **Exclusive Choice** for foundational, singular commitments (e.g., selecting a primary technology, a specific workflow rule). These questions require a single answer.
-        
+
         *   **2. Formulate the Question:** Use the `ask_user` tool: Adhere to the following for each question in the `questions` array:
             - **header:** Very short label (max 16 chars).
             - **type:** "choice", "text", or "yesno".
@@ -86,6 +80,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 3.  **Draft `spec.md`:** Once sufficient information is gathered, draft the content for the track's `spec.md` file, including sections like Overview, Functional Requirements, Non-Functional Requirements (if any), Acceptance Criteria, and Out of Scope.
 
 4.  **User Confirmation:**
+    -   **Announce:** Briefly state that the draft is ready (e.g., "Draft generated."). Do NOT repeat the request to "review" or "approve" in the chat.
     -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Spec"
@@ -118,6 +113,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
     *   **CRITICAL: Inject Phase Completion Tasks.** Determine if a "Phase Completion Verification and Checkpointing Protocol" is defined in the **Workflow**. If this protocol exists, then for each **Phase** that you generate in `plan.md`, you MUST append a final meta-task to that phase. The format for this meta-task is: `- [ ] Task: Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)`.
 
 3.  **User Confirmation:**
+    -   **Announce:** Briefly state that the draft is ready (e.g., "Draft generated."). Do NOT repeat the request to "review" or "approve" in the chat.
     -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Plan"
@@ -134,40 +130,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
                 - Label: "Revise", Description: "I want to modify the implementation steps."
     Await user feedback and revise the `plan.md` content until confirmed.
 
-### 2.4 Skill Recommendation (Interactive)
-1.  **Analyze Needs:**
-    -   Read `skills/catalog.md` from the directory where the Conductor extension is installed (typically `~/.gemini/extensions/conductor/skills/catalog.md`).
-    -   Analyze the confirmed `spec.md` and `plan.md` against the `Detection Signals` in the loaded `skills/catalog.md`.
-    -   Identify any relevant skills that are NOT yet installed (check `~/.agents/extensions/conductor/skills/` and `.agents/skills/`).
-2.  **Recommendation Loop:**
-    -   **If relevant missing skills are found:**
-        -   **Ask:** "Would you like to install these skills now?" using the `ask_user` tool (do not repeat in chat):
-            - **questions:**
-                - **header:** "Install Skills"
-                - **question:** "I've identified some skills that could help with this track. Would you like to install any of them?"
-                - **type:** "choice"
-                - **multiSelect:** true
-                - **options:** (Populate with the recommended skills, providing a `label` and a `description` explaining the relevance for each).
-        -   **Install:** If the user selects any skills, then for each selected skill:
-            -   **Determine Installation Path:**
-                - If `alwaysRecommend` is true, set the path to `~/.agents/extensions/conductor/skills/<skill-name>/`.
-                - Otherwise, set the path to `.agents/skills/<skill-name>/`.
-            -   Create directory at the determined path.
-            -   **Determine Download Strategy:**
-                - If `party` is '1p':
-                    - If `version` is provided, download that specific version.
-                    - Otherwise, download the latest copy at the exact `url`.
-                - If `party` is '3p', MUST use the provided `commit_sha` to download the specific vetted commit.
-            -   Download the content of the skill folder from the `url` specified in `catalog.md` (using the determined strategy) to the determined path.
-            -   **CRITICAL:** If the URL is a file path, find the parent folder. If it is a Git URL, use `git clone` or `sparse-checkout` to get the folder.
-    -   **If no missing skills found:** Skip this section.
-
-### 2.4.1 Skill Reload Confirmation
-1.  **Execution Trigger:** This step MUST only be executed if you installed new skills in the previous section.
-2.  **Notify and Pause:** **CRITICAL:** You MUST explicitly instruct the user: "New skills installed. Please run `/skills reload` to enable them. Let me know when you have done this." Do NOT use the `ask_user` tool here.
-3.  **Wait for Confirmation:** You MUST pause your execution here and wait for the user to confirm they have run the command and reloaded the skills before proceeding.
-
-### 2.5 Create Track Artifacts and Update Main Plan
+### 2.4 Create Track Artifacts and Update Main Plan
 
 1.  **Check for existing track name:** Before generating a new Track ID, resolve the **Tracks Directory** using the **Universal File Resolution Protocol**. List all existing track directories in that resolved path. Extract the short names from these track IDs (e.g., ``shortname_YYYYMMDD`` -> `shortname`). If the proposed short name for the new track (derived from the initial description) matches an existing short name, halt the `newTrack` creation. Explain that a track with that name already exists and suggest choosing a different name or resuming the existing track.
 2.  **Generate Track ID:** Create a unique Track ID (e.g., ``shortname_YYYYMMDD``).
@@ -195,9 +158,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         - [Implementation Plan](./plan.md)
         - [Metadata](./metadata.json)
         ```
-6.  **Exit Plan Mode:** Call the `exit_plan_mode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
-
-7.  **Update Tracks Registry:**
+6.  **Update Tracks Registry:**
     -   **Announce:** Inform the user you are updating the **Tracks Registry**.
     -   **Append Section:** Resolve the **Tracks Registry** via the **Universal File Resolution Protocol**. Append a new section for the track to the end of this file. The format MUST be:
         ```markdown
@@ -208,10 +169,10 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         *Link: [./<Relative Track Path>/](./<Relative Track Path>/)*
         ```
         (Replace `<Relative Track Path>` with the path to the track directory relative to the **Tracks Registry** file location.)
-8.  **Commit Code Changes:**
+7.  **Commit Code Changes:**
     -   **Announce:** Inform the user you are committing the **Tracks Registry** changes.
     -   **Commit Changes:** Stage the **Tracks Registry** files and commit with the message `chore(conductor): Add new track '<track_description>'`.
-9.  **Announce Completion:** Inform the user:
+8.  **Announce Completion:** Inform the user:
     > "New track '<track_id>' has been created and added to the tracks file. You can now start implementation by running `/conductor:implement`."
 
 """

@@ -10,8 +10,6 @@ You are an AI agent assistant for the Conductor spec-driven development framewor
 
 CRITICAL: You must validate the success of every tool call. If any tool call fails, you MUST halt the current operation immediately, announce the failure to the user, and await further instructions.
 
-PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mode, you are explicitly permitted and required to use `Write`, `Edit`, and authorized `Bash` calls to create and modify files within the `conductor/` directory. **CRITICAL: You MUST use relative paths starting with `conductor/` (e.g., `conductor/product.md`) for all file operations. Do NOT use absolute paths, as they will be blocked by Plan Mode security policies. REDIRECTION (e.g., `>` or `>>`) is strictly NOT allowed in `Bash` calls while in Plan Mode and will cause tool failure.**
-
 ---
 
 ## 1.1 SETUP CHECK
@@ -35,19 +33,15 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 ### 2.1 Get Track Description and Determine Type
 
 1.  **Load Project Context:** Read and understand the content of the project documents (**Product Definition**, **Tech Stack**, etc.) resolved via the **Universal File Resolution Protocol**.
-2.  **Get Track Description & Enter Plan Mode:**
-    *   **If `{{args}}` is empty:**
-        1. Call the `EnterPlanMode` tool with the reason: "Defining new track".
-        2. Ask the user using the `AskUserQuestion` tool (do not repeat the question in the chat):
-            - **questions:**
-                - **header:** "Description"
-                - **type:** "text"
-                - **question:** "Please provide a brief description of the track (feature, bug fix, chore, etc.) you wish to start."
-                - **placeholder:** "e.g., Implement user authentication"
-            Await the user's response and use it as the track description.
-    *   **If `{{args}}` contains a description:**
-        1. Use the content of `{{args}}` as the track description.
-        2. Call the `EnterPlanMode` tool with the reason: "Defining new track".
+2.  **Get Track Description:**
+    *   **If `{{args}}` contains a description:** Use the content of `{{args}}`.
+    *   **If `{{args}}` is empty:** Ask the user using the `AskUserQuestion` tool (do not repeat the question in the chat):
+        - **questions:**
+            - **header:** "Description"
+            - **type:** "text"
+            - **question:** "Please provide a brief description of the track (feature, bug fix, chore, etc.) you wish to start."
+            - **placeholder:** "e.g., Implement user authentication"
+        Await the user's response and use it as the track description.
 3.  **Infer Track Type:** Analyze the description to determine if it is a "Feature" or "Something Else" (e.g., Bug, Chore, Refactor). Do NOT ask the user to classify it.
 
 ### 2.2 Interactive Specification Generation (`spec.md`)
@@ -65,7 +59,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         *   **1. Classify Question Type:** Before formulating any question, you MUST first classify its purpose as either "Additive" or "Exclusive Choice".
             *   Use **Additive** for brainstorming and defining scope (e.g., users, goals, features, project guidelines). These questions allow for multiple answers.
             *   Use **Exclusive Choice** for foundational, singular commitments (e.g., selecting a primary technology, a specific workflow rule). These questions require a single answer.
-        
+
         *   **2. Formulate the Question:** Use the `AskUserQuestion` tool: Adhere to the following for each question in the `questions` array:
             - **header:** Very short label (max 16 chars).
             - **type:** "choice", "text", or "yesno".
@@ -91,6 +85,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 3.  **Draft `spec.md`:** Once sufficient information is gathered, draft the content for the track's `spec.md` file, including sections like Overview, Functional Requirements, Non-Functional Requirements (if any), Acceptance Criteria, and Out of Scope.
 
 4.  **User Confirmation:**
+    -   **Announce:** Briefly state that the draft is ready (e.g., "Draft generated."). Do NOT repeat the request to "review" or "approve" in the chat.
     -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Spec"
@@ -123,6 +118,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
     *   **CRITICAL: Inject Phase Completion Tasks.** Determine if a "Phase Completion Verification and Checkpointing Protocol" is defined in the **Workflow**. If this protocol exists, then for each **Phase** that you generate in `plan.md`, you MUST append a final meta-task to that phase. The format for this meta-task is: `- [ ] Task: Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)`.
 
 3.  **User Confirmation:**
+    -   **Announce:** Briefly state that the draft is ready (e.g., "Draft generated."). Do NOT repeat the request to "review" or "approve" in the chat.
     -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Plan"
@@ -167,9 +163,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         - [Implementation Plan](./plan.md)
         - [Metadata](./metadata.json)
         ```
-6.  **Exit Plan Mode:** Call the `ExitPlanMode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
-
-7.  **Update Tracks Registry:**
+6.  **Update Tracks Registry:**
     -   **Announce:** Inform the user you are updating the **Tracks Registry**.
     -   **Append Section:** Resolve the **Tracks Registry** via the **Universal File Resolution Protocol**. Append a new section for the track to the end of this file. The format MUST be:
         ```markdown
@@ -180,8 +174,10 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         *Link: [./<Relative Track Path>/](./<Relative Track Path>/)*
         ```
         (Replace `<Relative Track Path>` with the path to the track directory relative to the **Tracks Registry** file location.)
-8.  **Commit Code Changes:**
+7.  **Commit Code Changes:**
     -   **Announce:** Inform the user you are committing the **Tracks Registry** changes.
     -   **Commit Changes:** Stage the **Tracks Registry** files and commit with the message `chore(conductor): Add new track '<track_description>'`.
-9.  **Announce Completion:** Inform the user:
+8.  **Announce Completion:** Inform the user:
     > "New track '<track_id>' has been created and added to the tracks file. You can now start implementation by running `/conductor:implement`."
+
+
