@@ -45,18 +45,18 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 2.  **Auto-Detect Scope:**
     -   If no input, read the **Tracks Registry**.
     -   Look for a track marked as `[~] In Progress`.
-    -   If one exists, immediately call the `ask_user` tool to confirm (do not repeat the question in the chat):
+    -   If one exists, immediately call the `AskUserQuestion` tool to confirm (do not repeat the question in the chat):
         - **questions:**
             - **header:** "Review Track"
             - **question:** "Do you want to review the in-progress track '<track_name>'?"
             - **type:** "yesno"
-    -   If no track is in progress, or user says "no", immediately call the `ask_user` tool to ask for the scope (do not repeat the question in the chat):
+    -   If no track is in progress, or user says "no", immediately call the `AskUserQuestion` tool to ask for the scope (do not repeat the question in the chat):
         - **questions:**
             - **header:** "Select Scope"
             - **question:** "What would you like to review?"
             - **type:** "text"
             - **placeholder:** "Enter track name, or 'current' for uncommitted changes"
-3.  **Confirm Scope:** Ensure you and the user agree on what is being reviewed by immediately calling the `ask_user` tool (do not repeat the question in the chat):
+3.  **Confirm Scope:** Ensure you and the user agree on what is being reviewed by immediately calling the `AskUserQuestion` tool (do not repeat the question in the chat):
     - **questions:**
         - **header:** "Confirm Scope"
         - **question:** "I will review: '<identified_scope>'. Is this correct?"
@@ -82,7 +82,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
             -   Run `git diff <revision_range>` to get the full context in one go.
             -   Proceed to "Analyze and Verify".
         -   **Large Changes (> 300 lines):**
-            -   **Confirm:** Immediately call the `ask_user` tool to confirm before proceeding with a large review (do not repeat the question in the chat):
+            -   **Confirm:** Immediately call the `AskUserQuestion` tool to confirm before proceeding with a large review (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Large Review"
                     - **question:** "This review involves >300 lines of changes. I will use 'Iterative Review Mode' which may take longer. Proceed?"
@@ -151,7 +151,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   If no issues found:
         - Announce: "Everything looks great! I don't see any issues."
 2.  **Action:**
-    -   **If issues found:** Immediately call the `ask_user` tool (do not repeat the question in the chat):
+    -   **If issues found:** Immediately call the `AskUserQuestion` tool (do not repeat the question in the chat):
         - **questions:**
             - **header:** "Decision"
             - **question:** "How would you like to proceed with the findings?"
@@ -174,7 +174,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   If NO changes are detected, proceed to '3.3 Track Cleanup'.
     -   If changes are detected:
         a. **Check for Track Context:**
-            - If you are NOT reviewing a specific track (i.e., you don't have a `plan.md` in context), immediately call the `ask_user` tool (do not repeat the question in the chat):
+            - If you are NOT reviewing a specific track (i.e., you don't have a `plan.md` in context), immediately call the `AskUserQuestion` tool (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Commit Changes"
                     - **question:** "I've detected uncommitted changes. Should I commit them?"
@@ -182,7 +182,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
                 - If 'yes', stage all changes and commit with `fix(conductor): Apply review suggestions <brief description of changes>`.
                 - Proceed to '3.3 Track Cleanup'.
         b. **Handle Track-Specific Changes:**
-            i.   **Confirm with User:** Immediately call the `ask_user` tool (do not repeat the question in the chat):
+            i.   **Confirm with User:** Immediately call the `AskUserQuestion` tool (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Commit & Track"
                     - **question:** "I've detected uncommitted changes from the review process. Should I commit these and update the track's plan?"
@@ -213,7 +213,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 1.  **Context Check:** If you are NOT reviewing a specific track (e.g., just reviewing current changes without a track context), SKIP this entire section.
 
-2.  **Ask for User Choice:** Immediately call the `ask_user` tool to prompt the user (do not repeat the question in the chat):
+2.  **Ask for User Choice:** Immediately call the `AskUserQuestion` tool to prompt the user (do not repeat the question in the chat):
     - **questions:**
         - **header:** "Track Cleanup"
         - **question:** "Review complete. What would you like to do with track '<track_name>'?"
@@ -232,7 +232,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
         iv.  **Commit:** Stage registry and archive. Commit: `chore(conductor): Archive track '<track_name>'`.
         v.   **Announce:** "Track '<track_name>' archived."
     *   **If "Delete":**
-        i.   **Confirm:** Immediately call the `ask_user` tool to ask for final confirmation (do not repeat the warning in the chat):
+        i.   **Confirm:** Immediately call the `AskUserQuestion` tool to ask for final confirmation (do not repeat the warning in the chat):
             - **questions:**
                 - **header:** "Confirm"
                 - **question:** "WARNING: This is an irreversible deletion. Do you want to proceed?"

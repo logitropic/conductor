@@ -7,6 +7,9 @@ def migrate_builtin_tools(content):
     content = content.replace("`write_file`", "`Write`")
     content = content.replace("`replace`", "`Edit`")
     content = content.replace("`run_shell_command`", "`Bash`")
+    content = content.replace("`enter_plan_mode`", "`EnterPlanMode`")
+    content = content.replace("`exit_plan_mode`", "`ExitPlanMode`")
+    content = content.replace("`ask_user`", "`AskUserQuestion`")
     return content
 
 def migrate_conductor():

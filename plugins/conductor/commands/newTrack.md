@@ -37,8 +37,8 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 1.  **Load Project Context:** Read and understand the content of the project documents (**Product Definition**, **Tech Stack**, etc.) resolved via the **Universal File Resolution Protocol**.
 2.  **Get Track Description & Enter Plan Mode:**
     *   **If `{{args}}` is empty:**
-        1. Call the `enter_plan_mode` tool with the reason: "Defining new track".
-        2. Ask the user using the `ask_user` tool (do not repeat the question in the chat):
+        1. Call the `EnterPlanMode` tool with the reason: "Defining new track".
+        2. Ask the user using the `AskUserQuestion` tool (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Description"
                 - **type:** "text"
@@ -47,7 +47,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
             Await the user's response and use it as the track description.
     *   **If `{{args}}` contains a description:**
         1. Use the content of `{{args}}` as the track description.
-        2. Call the `enter_plan_mode` tool with the reason: "Defining new track".
+        2. Call the `EnterPlanMode` tool with the reason: "Defining new track".
 3.  **Infer Track Type:** Analyze the description to determine if it is a "Feature" or "Something Else" (e.g., Bug, Chore, Refactor). Do NOT ask the user to classify it.
 
 ### 2.2 Interactive Specification Generation (`spec.md`)
@@ -55,8 +55,8 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
 1.  **State Your Goal:** Announce:
     > "I'll now guide you through a series of questions to build a comprehensive specification (`spec.md`) for this track."
 
-2.  **Questioning Phase:** Ask a series of questions to gather details for the `spec.md` using the `ask_user` tool. You must batch up to 4 related questions in a single tool call to streamline the process. Tailor questions based on the track type (Feature or Other).
-    *   **CRITICAL:** Wait for the user's response after each `ask_user` tool call.
+2.  **Questioning Phase:** Ask a series of questions to gather details for the `spec.md` using the `AskUserQuestion` tool. You must batch up to 4 related questions in a single tool call to streamline the process. Tailor questions based on the track type (Feature or Other).
+    *   **CRITICAL:** Wait for the user's response after each `AskUserQuestion` tool call.
     *   **General Guidelines:**
         *   Refer to information in **Product Definition**, **Tech Stack**, etc., to ask context-aware questions.
         *   Provide a brief explanation and clear examples for each question.
@@ -66,7 +66,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
             *   Use **Additive** for brainstorming and defining scope (e.g., users, goals, features, project guidelines). These questions allow for multiple answers.
             *   Use **Exclusive Choice** for foundational, singular commitments (e.g., selecting a primary technology, a specific workflow rule). These questions require a single answer.
         
-        *   **2. Formulate the Question:** Use the `ask_user` tool: Adhere to the following for each question in the `questions` array:
+        *   **2. Formulate the Question:** Use the `AskUserQuestion` tool: Adhere to the following for each question in the `questions` array:
             - **header:** Very short label (max 16 chars).
             - **type:** "choice", "text", or "yesno".
             - **multiSelect:** (Required for type: "choice") Set to `true` for multi-select (additive) or `false` for single-choice (exclusive).
@@ -74,24 +74,24 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
             - **placeholder:** (For type: "text") Provide a hint.
 
         *   **3. Interaction Flow:**
-            *   Wait for the user's response after each `ask_user` tool call.
-            *   If the user selects "Other", use a subsequent `ask_user` tool call with `type: "text"` to get their input if necessary.
+            *   Wait for the user's response after each `AskUserQuestion` tool call.
+            *   If the user selects "Other", use a subsequent `AskUserQuestion` tool call with `type: "text"` to get their input if necessary.
             *   Confirm your understanding by summarizing before moving on to drafting.
 
     *   **If FEATURE:**
-        *   **Ask 3-4 relevant questions** to clarify the feature request using the `ask_user` tool.
+        *   **Ask 3-4 relevant questions** to clarify the feature request using the `AskUserQuestion` tool.
         *   Examples include clarifying questions about the feature, how it should be implemented, interactions, inputs/outputs, etc.
         *   Tailor the questions to the specific feature request (e.g., if the user didn't specify the UI, ask about it; if they didn't specify the logic, ask about it).
 
     *   **If SOMETHING ELSE (Bug, Chore, etc.):**
-        *   **Ask 2-3 relevant questions** to obtain necessary details using the `ask_user` tool.
+        *   **Ask 2-3 relevant questions** to obtain necessary details using the `AskUserQuestion` tool.
         *   Examples include reproduction steps for bugs, specific scope for chores, or success criteria.
         *   Tailor the questions to the specific request.
 
 3.  **Draft `spec.md`:** Once sufficient information is gathered, draft the content for the track's `spec.md` file, including sections like Overview, Functional Requirements, Non-Functional Requirements (if any), Acceptance Criteria, and Out of Scope.
 
 4.  **User Confirmation:**
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Spec"
             - **question:**
@@ -123,7 +123,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
     *   **CRITICAL: Inject Phase Completion Tasks.** Determine if a "Phase Completion Verification and Checkpointing Protocol" is defined in the **Workflow**. If this protocol exists, then for each **Phase** that you generate in `plan.md`, you MUST append a final meta-task to that phase. The format for this meta-task is: `- [ ] Task: Conductor - User Manual Verification '<Phase Name>' (Protocol in workflow.md)`.
 
 3.  **User Confirmation:**
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Confirm Plan"
             - **question:**
@@ -139,40 +139,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
                 - Label: "Revise", Description: "I want to modify the implementation steps."
     Await user feedback and revise the `plan.md` content until confirmed.
 
-### 2.4 Skill Recommendation (Interactive)
-1.  **Analyze Needs:**
-    -   Read `skills/catalog.md` from the directory where the Conductor extension is installed (typically `~/.gemini/extensions/conductor/skills/catalog.md`).
-    -   Analyze the confirmed `spec.md` and `plan.md` against the `Detection Signals` in the loaded `skills/catalog.md`.
-    -   Identify any relevant skills that are NOT yet installed (check `~/.agents/extensions/conductor/skills/` and `.agents/skills/`).
-2.  **Recommendation Loop:**
-    -   **If relevant missing skills are found:**
-        -   **Ask:** "Would you like to install these skills now?" using the `ask_user` tool (do not repeat in chat):
-            - **questions:**
-                - **header:** "Install Skills"
-                - **question:** "I've identified some skills that could help with this track. Would you like to install any of them?"
-                - **type:** "choice"
-                - **multiSelect:** true
-                - **options:** (Populate with the recommended skills, providing a `label` and a `description` explaining the relevance for each).
-        -   **Install:** If the user selects any skills, then for each selected skill:
-            -   **Determine Installation Path:**
-                - If `alwaysRecommend` is true, set the path to `~/.agents/extensions/conductor/skills/<skill-name>/`.
-                - Otherwise, set the path to `.agents/skills/<skill-name>/`.
-            -   Create directory at the determined path.
-            -   **Determine Download Strategy:**
-                - If `party` is '1p':
-                    - If `version` is provided, download that specific version.
-                    - Otherwise, download the latest copy at the exact `url`.
-                - If `party` is '3p', MUST use the provided `commit_sha` to download the specific vetted commit.
-            -   Download the content of the skill folder from the `url` specified in `catalog.md` (using the determined strategy) to the determined path.
-            -   **CRITICAL:** If the URL is a file path, find the parent folder. If it is a Git URL, use `git clone` or `sparse-checkout` to get the folder.
-    -   **If no missing skills found:** Skip this section.
-
-### 2.4.1 Skill Reload Confirmation
-1.  **Execution Trigger:** This step MUST only be executed if you installed new skills in the previous section.
-2.  **Notify and Pause:** **CRITICAL:** You MUST explicitly instruct the user: "New skills installed. Please run `/skills reload` to enable them. Let me know when you have done this." Do NOT use the `ask_user` tool here.
-3.  **Wait for Confirmation:** You MUST pause your execution here and wait for the user to confirm they have run the command and reloaded the skills before proceeding.
-
-### 2.5 Create Track Artifacts and Update Main Plan
+### 2.4 Create Track Artifacts and Update Main Plan
 
 1.  **Check for existing track name:** Before generating a new Track ID, resolve the **Tracks Directory** using the **Universal File Resolution Protocol**. List all existing track directories in that resolved path. Extract the short names from these track IDs (e.g., ``shortname_YYYYMMDD`` -> `shortname`). If the proposed short name for the new track (derived from the initial description) matches an existing short name, halt the `newTrack` creation. Explain that a track with that name already exists and suggest choosing a different name or resuming the existing track.
 2.  **Generate Track ID:** Create a unique Track ID (e.g., ``shortname_YYYYMMDD``).
@@ -200,7 +167,7 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
         - [Implementation Plan](./plan.md)
         - [Metadata](./metadata.json)
         ```
-6.  **Exit Plan Mode:** Call the `exit_plan_mode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
+6.  **Exit Plan Mode:** Call the `ExitPlanMode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
 
 7.  **Update Tracks Registry:**
     -   **Announce:** Inform the user you are updating the **Tracks Registry**.
@@ -218,5 +185,3 @@ PLAN MODE PROTOCOL: Parts of this process run within Plan Mode. While in Plan Mo
     -   **Commit Changes:** Stage the **Tracks Registry** files and commit with the message `chore(conductor): Add new track '<track_description>'`.
 9.  **Announce Completion:** Inform the user:
     > "New track '<track_id>' has been created and added to the tracks file. You can now start implementation by running `/conductor:implement`."
-
-

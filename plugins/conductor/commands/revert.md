@@ -42,12 +42,12 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
     *   **PATH A: Direct Confirmation**
         1.  Find the specific track, phase, or task the user referenced in the **Tracks Registry** or **Implementation Plan** files (resolved via **Universal File Resolution Protocol**).
-        2.  Immediately call the `ask_user` tool to confirm the selection (do not repeat the question in the chat):
+        2.  Immediately call the `AskUserQuestion` tool to confirm the selection (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Confirm"
                 - **question:** "You asked to revert the [Track/Phase/Task]: '[Description]'. Is this correct?"
                 - **type:** "yesno"
-        3.  If "yes", establish this as the `target_intent` and proceed to Phase 2. If "no", immediately call the `ask_user` tool to ask clarifying questions (do not repeat the question in the chat):
+        3.  If "yes", establish this as the `target_intent` and proceed to Phase 2. If "no", immediately call the `AskUserQuestion` tool to ask clarifying questions (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Clarify"
                 - **question:** "I'm sorry, I misunderstood. Please describe the Track, Phase, or Task you would like to revert."
@@ -58,7 +58,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
             *   **Scan All Plans:** You MUST read the **Tracks Registry** and every track's **Implementation Plan** (resolved via **Universal File Resolution Protocol** using the track's index file).
             *   **Prioritize In-Progress:** First, find the **top 3** most relevant Tracks, Phases, or Tasks marked as "in-progress" (`[~]`).
             *   **Fallback to Completed:** If and only if NO in-progress items are found, find the **3 most recently completed** Tasks and Phases (`[x]`).
-        2.  **Present a Unified Hierarchical Menu:** Immediately call the `ask_user` tool to present the results (do not list them in the chat first):
+        2.  **Present a Unified Hierarchical Menu:** Immediately call the `AskUserQuestion` tool to present the results (do not list them in the chat first):
             - **questions:**
                 - **header:** "Select Item"
                 - **question:** "I found multiple in-progress items (or recently completed items). Please choose which one to revert:"
@@ -70,7 +70,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
                     - **Note:** The "Other" option is automatically added by the tool.
         3.  **Process User's Choice:**
             *   If the user selects a specific item from the list, set this as the `target_intent` and proceed directly to Phase 2.
-            *   If the user selects "Other" (automatically added for "choice") or the explicit "Other" option provided, you must engage in a dialogue to find the correct target using `ask_user` tool with a single question of `type: "text"` in the `questions` array.
+            *   If the user selects "Other" (automatically added for "choice") or the explicit "Other" option provided, you must engage in a dialogue to find the correct target using `AskUserQuestion` tool with a single question of `type: "text"` in the `questions` array.
                 * Once a target is identified, loop back to Path A for final confirmation.
 
 4.  **Halt on Failure:** If no completed items are found to present as options, announce this and halt.
@@ -110,7 +110,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     > `  - <sha_plan_commit> ('conductor(plan): Mark task complete')`
     > *   **Action:** I will run `git revert` on these commits in reverse order.
 
-2.  **Final Go/No-Go:** Immediately call the `ask_user` tool to ask for final confirmation (do not repeat the question in the chat):
+2.  **Final Go/No-Go:** Immediately call the `AskUserQuestion` tool to ask for final confirmation (do not repeat the question in the chat):
     - **questions:**
         - **header:** "Confirm Plan"
         - **question:** "Do you want to proceed with the drafted plan?"
@@ -122,7 +122,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 3.  **Process User Choice:**
     - If "Approve", proceed to Phase 4.
-    - If "Revise", immediately call the `ask_user` tool to get the correct plan (do not repeat the question in the chat):
+    - If "Revise", immediately call the `AskUserQuestion` tool to get the correct plan (do not repeat the question in the chat):
         - **questions:**
             - **header:** "Revise"
             - **question:** "Please describe the changes needed for the revert plan."

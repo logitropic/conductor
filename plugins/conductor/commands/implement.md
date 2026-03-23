@@ -40,12 +40,12 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 4.  **Select Track:**
     -   **If a track name was provided:**
         1.  Perform an exact, case-insensitive match for the provided name against the track descriptions you parsed.
-        2.  If a unique match is found, immediately call the `ask_user` tool to confirm the selection (do not repeat the question in the chat):
+        2.  If a unique match is found, immediately call the `AskUserQuestion` tool to confirm the selection (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Confirm"
                 - **question:** "I found track '<track_description>'. Is this correct?"
                 - **type:** "yesno"
-        3.  If no match is found, or if the match is ambiguous, immediately call the `ask_user` tool to inform the user and request the correct track name (do not repeat the question in the chat):
+        3.  If no match is found, or if the match is ambiguous, immediately call the `AskUserQuestion` tool to inform the user and request the correct track name (do not repeat the question in the chat):
             - **questions:**
                 - **header:** "Clarify"
                 - **question:** "I couldn't find a unique track matching the name you provided. Did you mean '<next_available_track>'? Or please type the exact track name."
@@ -53,12 +53,12 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   **If no track name was provided (or if the previous step failed):**
         1.  **Identify Next Track:** Find the first track in the parsed tracks file that is NOT marked as `[x] Completed`.
         2.  **If a next track is found:**
-            -   Immediately call the `ask_user` tool to confirm the selection (do not repeat the question in the chat):
+            -   Immediately call the `AskUserQuestion` tool to confirm the selection (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Next Track"
                     - **question:** "No track name provided. Would you like to proceed with the next incomplete track: '<track_description>'?"
                     - **type:** "yesno"
-            -   If confirmed, proceed with this track. Otherwise, immediately call the `ask_user` tool to request the correct track name (do not repeat the question in the chat):
+            -   If confirmed, proceed with this track. Otherwise, immediately call the `AskUserQuestion` tool to request the correct track name (do not repeat the question in the chat):
                 - **questions:**
                     - **header:** "Clarify"
                     - **question:** "Please type the exact name of the track you would like to implement."
@@ -98,7 +98,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     b. **Iterate Through Tasks:** You MUST now loop through each task in the track's **Implementation Plan** one by one.
     c. **For Each Task, You MUST:**
         i. **Defer to Workflow:** The **Workflow** file is the **single source of truth** for the entire task lifecycle. You MUST now read and execute the procedures defined in the "Task Workflow" section of the **Workflow** file you have in your context. Follow its steps for implementation, testing, and committing precisely.
-           - **CRITICAL:** Every human-in-the-loop interaction, confirmation, or request for feedback mentioned in the **Workflow** (e.g., manual verification plans or guidance on persistent failures) MUST be conducted using the `ask_user` tool.
+           - **CRITICAL:** Every human-in-the-loop interaction, confirmation, or request for feedback mentioned in the **Workflow** (e.g., manual verification plans or guidance on persistent failures) MUST be conducted using the `AskUserQuestion` tool.
 
 5.  **Finalize Track:**
     -   After all tasks in the track's local **Implementation Plan** are completed, you MUST update the track's status in the **Tracks Registry**.
@@ -128,7 +128,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     b.  **Update Product Definition:**
         i. **Condition for Update:** Based on your analysis, you MUST determine if the completed feature or bug fix significantly impacts the description of the product itself.
         ii. **Propose and Confirm Changes:** If an update is needed:
-            -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the proposed updates (in a diff format) directly into the `question` field so the user can review them in context.
+            -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the proposed updates (in a diff format) directly into the `question` field so the user can review them in context.
                 - **questions:**
                     - **header:** "Product"
                     - **question:**
@@ -142,7 +142,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     c.  **Update Tech Stack:**
         i. **Condition for Update:** Similarly, you MUST determine if significant changes in the technology stack are detected as a result of the completed track.
         ii. **Propose and Confirm Changes:** If an update is needed:
-            -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the proposed updates (in a diff format) directly into the `question` field so the user can review them in context.
+            -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the proposed updates (in a diff format) directly into the `question` field so the user can review them in context.
                 - **questions:**
                     - **header:** "Tech Stack"
                     - **question:**
@@ -157,7 +157,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
         i. **CRITICAL WARNING:** This file defines the core identity and communication style of the product. It should be modified with extreme caution and ONLY in cases of significant strategic shifts, such as a product rebrand or a fundamental change in user engagement philosophy. Routine feature updates or bug fixes should NOT trigger changes to this file.
         ii. **Condition for Update:** You may ONLY propose an update to this file if the track's **Specification** explicitly describes a change that directly impacts branding, voice, tone, or other core product guidelines.
         iii. **Propose and Confirm Changes:** If the conditions are met:
-            -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the proposed changes (in a diff format) directly into the `question` field, including a clear warning.
+            -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the proposed changes (in a diff format) directly into the `question` field, including a clear warning.
                 - **questions:**
                     - **header:** "Product"
                     - **question:**
@@ -189,7 +189,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
 
 1.  **Execution Trigger:** This protocol MUST only be executed after the current track has been successfully implemented and the `SYNCHRONIZE PROJECT DOCUMENTATION` step is complete.
 
-2.  **Ask for User Choice:** Immediately call the `ask_user` tool to prompt the user (do not repeat the question in the chat):
+2.  **Ask for User Choice:** Immediately call the `AskUserQuestion` tool to prompt the user (do not repeat the question in the chat):
     - **questions:**
         - **header:** "Track Cleanup"
         - **question:** "Track '<track_description>' is now complete. What would you like to do?"
@@ -211,7 +211,7 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
         iv.  **Commit Changes:** Stage the **Tracks Registry** file and `conductor/archive/`. Commit with the message `chore(conductor): Archive track '<track_description>'`.
         v.   **Announce Success:** Announce: "Track '<track_description>' has been successfully archived."
     *   **If user chooses "Delete":**
-        i. **CRITICAL WARNING:** Before proceeding, immediately call the `ask_user` tool to ask for final confirmation (do not repeat the warning in the chat):
+        i. **CRITICAL WARNING:** Before proceeding, immediately call the `AskUserQuestion` tool to ask for final confirmation (do not repeat the warning in the chat):
             - **questions:**
                 - **header:** "Confirm"
                 - **question:** "WARNING: This will permanently delete the track folder and all its contents. This action cannot be undone. Are you sure?"

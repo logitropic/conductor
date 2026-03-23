@@ -29,7 +29,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 ## 1.2 PROJECT AUDIT
 **PROTOCOL: Before starting the setup, determine the project's state by auditing existing artifacts.**
 
-1.  **Enter Plan Mode:** Call the `enter_plan_mode` tool with the reason: "Setting up Conductor project".
+1.  **Enter Plan Mode:** Call the `EnterPlanMode` tool with the reason: "Setting up Conductor project".
 
 2.  **Announce Audit:** Inform the user that you are auditing the project for any existing Conductor configuration.
 
@@ -90,7 +90,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
         -   **Begin Brownfield Project Initialization Protocol:**
             -   **1.0 Pre-analysis Confirmation:**
                 1.  **Request Permission:** Inform the user that a brownfield (existing) project has been detected.
-                2.  **Ask for Permission:** Request permission for a read-only scan to analyze the project using the `ask_user` tool:
+                2.  **Ask for Permission:** Request permission for a read-only scan to analyze the project using the `AskUserQuestion` tool:
                     - **header:** "Permission"
                     - **question:** "A brownfield (existing) project has been detected. May I perform a read-only scan to analyze the project?"
                     - **type:** "yesno"
@@ -126,7 +126,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   If a `.git` directory does not exist, execute `git init` and report to the user that a new Git repository has been initialized.
 
 5.  **Inquire about Project Goal (for Greenfield):**
-    -   **Ask the user the following question using the `ask_user` tool and wait for their response before proceeding to the next step:**
+    -   **Ask the user the following question using the `AskUserQuestion` tool and wait for their response before proceeding to the next step:**
         - **header:** "Project Goal"
         - **type:** "text"
         - **question:** "What do you want to build?"
@@ -140,7 +140,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 ### 2.1 Generate Product Guide (Interactive)
 1.  **Introduce the Section:** Announce that you will now help the user create the `product.md`.
-2.  **Determine Mode:** Use the `ask_user` tool to let the user choose their preferred workflow.
+2.  **Determine Mode:** Use the `AskUserQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Product"
         - **question:** "How would you like to define the product details? Whether you prefer a quick start or a deep dive, both paths lead to a high-quality product guide!"
@@ -152,7 +152,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 4.  **Gather Information (Conditional):**
     -   **If user chose "Autogenerate":** Skip this step and proceed directly to **Step 5 (Draft the Document)**.
-    -   **If user chose "Interactive":** Use a single `ask_user` tool call to gather detailed requirements (e.g., target users, goals, features).
+    -   **If user chose "Interactive":** Use a single `AskUserQuestion` tool call to gather detailed requirements (e.g., target users, goals, features).
         -   **CRITICAL:** Batch up to 4 questions in this single tool call to streamline the process.
         -   **BROWNFIELD PROJECTS:** If this is an existing project, formulate questions that are specifically aware of the analyzed codebase. Do not ask generic questions if the answer is already in the files.
         -   **SUGGESTIONS:** For each question, generate 3 high-quality suggested answers based on common patterns or context.
@@ -168,7 +168,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   **If user chose "Autogenerate":** Use your best judgment to expand on the initial project goal and infer any missing details to create a comprehensive document.
     -   **If user chose "Interactive":** Use the specific answers provided. The source of truth is **only the user's selected answer(s)**. You are encouraged to expand on these choices to create a polished output.
 5.  **User Confirmation Loop:**
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Review Draft"
             - **question:**
@@ -187,7 +187,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 ### 2.2 Generate Product Guidelines (Interactive)
 1.  **Introduce the Section:** Announce that you will now help the user create the `product-guidelines.md`.
-2.  **Determine Mode:** Use the `ask_user` tool to let the user choose their preferred workflow.
+2.  **Determine Mode:** Use the `AskUserQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Product"
         - **question:** "How would you like to define the product guidelines? You can hand-pick the style or let me generate a standard set."
@@ -199,7 +199,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 3.  **Gather Information (Conditional):**
     -   **If user chose "Autogenerate":** Skip this step and proceed directly to **Step 4 (Draft the Document)**.
-    -   **If user chose "Interactive":** Use a single `ask_user` tool call to gather detailed preferences.
+    -   **If user chose "Interactive":** Use a single `AskUserQuestion` tool call to gather detailed preferences.
         -   **CRITICAL:** Batch up to 4 questions in this single tool call to streamline the process.
         -   **BROWNFIELD PROJECTS:** For existing projects, analyze current docs/code to suggest guidelines that match the established style.
         -   **SUGGESTIONS:** For each question, generate 3 high-quality suggested answers based on common patterns or context.
@@ -215,7 +215,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   **If user chose "Autogenerate":** Use your best judgment to infer standard, high-quality guidelines suitable for the project type.
     -   **If user chose "Interactive":** Use the specific answers provided. The source of truth is **only the user's selected answer(s)**. You are encouraged to expand on these choices to create a polished output.
 5.  **User Confirmation Loop:**
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Review Draft"
             - **question:**
@@ -235,7 +235,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 ### 2.3 Generate Tech Stack (Interactive)
 1.  **Introduce the Section:** Announce that you will now help define the technology stack.
 2.  **Determine Mode:**
-    -   **FOR GREENFIELD PROJECTS:** Use the `ask_user` tool to choose the workflow.
+    -   **FOR GREENFIELD PROJECTS:** Use the `AskUserQuestion` tool to choose the workflow.
         - **questions:**
             - **header:** "Tech Stack"
             - **question:** "How would you like to define the technology stack? I can recommend a proven stack for your goal or you can hand-pick each component."
@@ -247,15 +247,15 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   **FOR BROWNFIELD PROJECTS:**
         -   **CRITICAL WARNING:** Your goal is to document the project's *existing* tech stack, not to propose changes.
         -   **State the Inferred Stack:** Based on the code analysis, you MUST state the technology stack that you have inferred in the chat.
-        -   **Request Confirmation:** After stating the detected stack, you MUST ask the user for confirmation using the `ask_user` tool:
+        -   **Request Confirmation:** After stating the detected stack, you MUST ask the user for confirmation using the `AskUserQuestion` tool:
             - **questions:**
                 - **header:** "Tech Stack"
                 - **question:** "Is the inferred tech stack (listed above) correct?"
                 - **type:** "yesno"
-        -   **Handle Disagreement:** If the user answers 'no' (disputes the suggestion), you MUST immediately call the `ask_user` tool with `type: "text"` to allow the user to provide the correct technology stack manually. Once provided, proceed to draft the document using the user's input.
+        -   **Handle Disagreement:** If the user answers 'no' (disputes the suggestion), you MUST immediately call the `AskUserQuestion` tool with `type: "text"` to allow the user to provide the correct technology stack manually. Once provided, proceed to draft the document using the user's input.
 
 3.  **Gather Information (Greenfield Interactive Only):**
-    -   **If user chose "Interactive":** Use a single `ask_user` tool call to gather detailed preferences.
+    -   **If user chose "Interactive":** Use a single `AskUserQuestion` tool call to gather detailed preferences.
         -   **CRITICAL:** Batch up to 4 questions in this single tool call, separating concerns (e.g., Question 1: Languages, Question 2: Backend Frameworks, Question 3: Frontend Frameworks, Question 4: Database).
         -   **SUGGESTIONS:** For each question, generate 3-4 high-quality suggested answers.
         -   **Formulation Guidelines:** Construct the `questions` array where each object has:
@@ -270,7 +270,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   **If user chose "Autogenerate":** Use your best judgment to infer a standard, high-quality stack suitable for the project goal.
     -   **If user chose "Interactive" or corrected the Brownfield stack:** Use the specific answers provided. The source of truth is **only the user's selected answer(s)**.
 5.  **User Confirmation Loop:**
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted content directly into the `question` field so the user can review it in context.
         - **questions:**
             - **header:** "Review Draft"
             - **question:**
@@ -293,7 +293,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   List the available style guides by using the `Bash` tool to execute `ls ~/.gemini/extensions/conductor/templates/code_styleguides/`. **CRITICAL: You MUST use `Bash` for this step. Do NOT use the `list_directory` tool, as the templates directory resides outside of your allowed workspace and the call will fail.**
     -   **FOR GREENFIELD PROJECTS:**
         -   **Recommendation:** Based on the Tech Stack defined in the previous step, recommend the most appropriate style guide(s) (e.g., "python.md" for a Python project) and explain why.
-        -   **Determine Mode:** Use the `ask_user` tool:
+        -   **Determine Mode:** Use the `AskUserQuestion` tool:
             - **questions:**
                 - **header:** "Code Style Guide"
                 - **question:** "How would you like to proceed with the code style guides?"
@@ -303,8 +303,8 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
                     - Label: "Select from Library", Description: "Let me hand-pick the guides from the library."
         -   **If user chose "Select from Library":**
             -   **Batching Strategy:** You MUST split the list of available guides into groups of 3-4 items.
-            -   **Action:** Announce "I'll present the available guides in groups. Please select all that apply." Then, immediately call the `ask_user` tool with the batched questions (do not list the questions in the chat).
-            -   **Single Tool Call:** Create one `ask_user` call containing a `questions` array with one question per group.
+            -   **Action:** Announce "I'll present the available guides in groups. Please select all that apply." Then, immediately call the `AskUserQuestion` tool with the batched questions (do not list the questions in the chat).
+            -   **Single Tool Call:** Create one `AskUserQuestion` call containing a `questions` array with one question per group.
             -   **Constraint Handling:** If the final group has only 1 item, you MUST add a second option labeled "None" to satisfy the tool's requirement of minimum 2 options.
             -   **Question Structure:**
                 - **header:** "Code Style Guide"
@@ -315,7 +315,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
     -   **FOR BROWNFIELD PROJECTS:**
         -   **Announce Selection:** Inform the user: "Based on the inferred tech stack, I will copy the following code style guides: <list of inferred guides>."
-        -   **Determine Mode:** Use the `ask_user` tool:
+        -   **Determine Mode:** Use the `AskUserQuestion` tool:
             - **questions:**
                 - **header:** "Code Style Guide"
                 - **question:** "I've identified these guides for your project. Would you like to proceed or add more?"
@@ -324,8 +324,8 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
                     - Label: "Proceed", Description: "Use the suggested guides."
                     - Label: "Add More", Description: "Select additional guides from the library."
         -   **If user chose "Add More":**
-            -   **Action:** Announce "I'll present the additional guides. Please select all that apply." Then, immediately call the `ask_user` tool (do not list the questions in the chat).
-            -   **Method:** Use a single `ask_user` tool call. Dynamically split the available guides into batches of 4 options max. Create one `multiSelect: true` question for each batch.
+            -   **Action:** Announce "I'll present the additional guides. Please select all that apply." Then, immediately call the `AskUserQuestion` tool (do not list the questions in the chat).
+            -   **Method:** Use a single `AskUserQuestion` tool call. Dynamically split the available guides into batches of 4 options max. Create one `multiSelect: true` question for each batch.
 
 3.  **Action:** Construct and execute a command to create the directory and copy all selected files. For example: `mkdir -p conductor/code_styleguides && cp ~/.gemini/extensions/conductor/templates/code_styleguides/python.md ~/.gemini/extensions/conductor/templates/code_styleguides/javascript.md conductor/code_styleguides/`
 4.  **Continue:** Immediately proceed to the next section.
@@ -333,7 +333,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 ### 2.5 Select Workflow (Interactive)
 1.  **Copy Initial Workflow:**
     -   Copy `~/.gemini/extensions/conductor/templates/workflow.md` to `conductor/workflow.md`.
-2.  **Determine Mode:** Use the `ask_user` tool to let the user choose their preferred workflow.
+2.  **Determine Mode:** Use the `AskUserQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Workflow"
         - **question:** "Do you want to use the default workflow or customize it? The default includes >80% test coverage and per-task commits."
@@ -345,7 +345,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 3.  **Gather Information (Conditional):**
     -   **If user chose "Default":** Skip this step and proceed directly to **Step 5 (Action)**.
     -   **If user chose "Customize":**
-        a. **Initial Batch:** Use a single `ask_user` tool call to gather primary customizations:
+        a. **Initial Batch:** Use a single `AskUserQuestion` tool call to gather primary customizations:
             - **questions:**
                 - **header:** "Coverage"
                 - **question:** "The default required test code coverage is >80%. What is your preferred percentage?" (type: "text", placeholder: "e.g., 90")
@@ -361,7 +361,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
                 - **options:**
                     - Label: "Git Notes", Description: "Store summaries in Git notes metadata"
                     - Label: "Commit Messages", Description: "Include summaries in the commit message body"
-        b. **Final Tweak (Second Batch):** Once the first batch is answered, immediately use a second `ask_user` tool call to show the result and allow for any additional tweaks:
+        b. **Final Tweak (Second Batch):** Once the first batch is answered, immediately use a second `AskUserQuestion` tool call to show the result and allow for any additional tweaks:
             - **questions:**
                 - **header:** "Workflow"
                 - **type:** "text"
@@ -384,7 +384,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   Identify "Always Recommended" skills.
 2.  **Determine Mode:**
     - **If no recommended skills are found:** Announce "No additional agent skills were recommended for this project context. Skipping skill installation." and skip to 2.7.
-    - **If recommended skills are found:** Use the `ask_user` tool to present recommendations and choose an installation path.
+    - **If recommended skills are found:** Use the `AskUserQuestion` tool to present recommendations and choose an installation path.
     - **questions:**
         - **header:** "Agent Skills"
         - **question:**
@@ -399,7 +399,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 3.  **Gather Selection (Conditional):**
     - **If user chose "Hand-pick":**
         - **Action:** List all available skills from the catalog in the chat (including names and descriptions).
-        - **Prompt for Selection:** Use the `ask_user` tool with a single question:
+        - **Prompt for Selection:** Use the `AskUserQuestion` tool with a single question:
             - **header:** "Select Skills"
             - **type:** "text"
             - **question:** "Which skill(s) would you like to install? You can type the names (comma-separated) or paste a list."
@@ -407,7 +407,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
         - **Interaction Flow:** Wait for the user's response, then parse the selected skills based on the names provided.
 4.  **Process Selection:**
     -   If "Install All": Install all recommended skills.
-    -   If "Hand-pick": Parse the results from the `ask_user` call and install selected skills.
+    -   If "Hand-pick": Parse the results from the `AskUserQuestion` call and install selected skills.
     -   If "Skip": Proceed without installation.
 5.  **Installation Action:**
     -   For each selected skill:
@@ -426,7 +426,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 ### 2.6.1 Skill Reload Confirmation
 1.  **Execution Trigger:** This step MUST only be executed if you installed new skills in the previous section.
-2.  **Notify and Pause:** **CRITICAL:** You MUST explicitly instruct the user: "New skills installed. Please run `/skills reload` to enable them. Let me know when you have done this." Do NOT use the `ask_user` tool here.
+2.  **Notify and Pause:** **CRITICAL:** You MUST explicitly instruct the user: "New skills installed. Please run `/skills reload` to enable them. Let me know when you have done this." Do NOT use the `AskUserQuestion` tool here.
 3.  **Wait for Confirmation:** You MUST pause your execution here and wait for the user to confirm they have run the command and reloaded the skills before proceeding.
 
 ### 2.7 Finalization
@@ -465,7 +465,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 ### 3.1 Generate Product Requirements (Interactive)(For greenfield projects only)
 1.  **Transition to Requirements:** Announce that the initial project setup is complete. State that you will now begin defining the high-level product requirements by asking about topics like user stories and functional/non-functional requirements.
 2.  **Analyze Context:** Read and analyze the content of `conductor/product.md` to understand the project's core concept.
-3.  **Determine Mode:** Use the `ask_user` tool to let the user choose their preferred workflow.
+3.  **Determine Mode:** Use the `AskUserQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Product Reqs"
         - **question:** "How would you like to define the product requirements? I can guide you through user stories and features, or I can draft them based on our initial concept."
@@ -476,7 +476,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 
 5.  **Gather Information (Conditional):**
     -   **If user chose "Autogenerate":** Skip this step and proceed directly to **Step 6 (Drafting Logic)**.
-    -   **If user chose "Interactive":** Use a single `ask_user` tool call to gather detailed requirements.
+    -   **If user chose "Interactive":** Use a single `AskUserQuestion` tool call to gather detailed requirements.
         -   **CRITICAL:** Batch up to 4 questions in this single tool call (e.g., User Stories, Key Features, Constraints, Non-functional Requirements).
         -   **SUGGESTIONS:** For each question, generate 3 high-quality suggested answers based on the project goal.
         -   **Formulation Guidelines:** Use "choice" type. Set `multiSelect` to `true` for additive answers. Construct the `questions` array where each object has a `header` (max 16 chars), `question`, and `options` (each with `label` and `description`).
@@ -487,7 +487,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
     -   **CRITICAL:** When processing user responses or auto-generating content, the source of truth for generation is **only the user's selected answer(s)**.
 7.  **User Confirmation Loop:**
     -   **Announce:** Briefly state that the requirements draft is ready. Do NOT repeat the request to "review" or "approve" in the chat.
-    -   **Ask for Approval:** Use the `ask_user` tool to request confirmation. You MUST embed the drafted requirements directly into the `question` field so the user can review them.
+    -   **Ask for Approval:** Use the `AskUserQuestion` tool to request confirmation. You MUST embed the drafted requirements directly into the `question` field so the user can review them.
         - **questions:**
             - **header:** "Review"
             - **question:**
@@ -508,7 +508,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 2.  **Generate Track Title:** Analyze the project context (`product.md`, `tech-stack.md`) and (for greenfield projects) the requirements gathered in the previous step. Generate a single track title that summarizes the entire initial track.
     - **Greenfield:** Focus on the MVP core (e.g., "Build core tip calculator functionality").
     - **Brownfield:** Focus on maintenance or targeted enhancements (e.g., "Implement user authentication flow").
-3.  **Confirm Proposal:** Use the `ask_user` tool to validate the proposal:
+3.  **Confirm Proposal:** Use the `AskUserQuestion` tool to validate the proposal:
     - **questions:**
         - **header:** "Confirm Track"
         - **type:** "choice"
@@ -520,7 +520,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
 4.  **Action:**
     -   **If user chose "Yes":** Use the suggested '<Track Title>' as the track description.
     -   **If user chose "Suggest changes":**
-        -   Immediately call the `ask_user` tool again:
+        -   Immediately call the `AskUserQuestion` tool again:
             - **header:** "New Track"
             - **type:** "text"
             - **question:** "Please enter the description for the initial track:"
@@ -578,7 +578,7 @@ PLAN MODE PROTOCOL: This setup process runs entirely within Plan Mode. While in 
             ```
             *(If you arrived here directly from the Audit because you are patching a missing index, write this file using the existing folder's track_id and then proceed to step d.)*
 
-    d. **Exit Plan Mode:** Call the `exit_plan_mode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
+    d. **Exit Plan Mode:** Call the `ExitPlanMode` tool with the path: `<Tracks Directory>/<track_id>/index.md`.
 
     e. **Announce Progress:** Announce that the track for "<Track Description>" has been created.
 
