@@ -10,6 +10,7 @@ def migrate_builtin_tools(content):
     content = content.replace("`enter_plan_mode`", "`EnterPlanMode`")
     content = content.replace("`exit_plan_mode`", "`ExitPlanMode`")
     content = content.replace("`ask_user`", "`AskUserQuestion`")
+    content = content.replace("~/.gemini/extensions/conductor", "${CLAUDE_SKILL_DIR}")
     return content
 
 def migrate_conductor():
@@ -43,6 +44,7 @@ description: {data['description']}
 argument-hint: [project-type]
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
@@ -60,6 +62,7 @@ description: {data['description']}
 argument-hint: [description]
 allowed-tools: Read, Write, Glob, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
@@ -77,6 +80,7 @@ description: {data['description']}
 argument-hint: [<track-name>] [--all]
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
@@ -93,6 +97,7 @@ f"""---
 description: {data['description']}
 allowed-tools: Read, Glob, Bash
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
@@ -109,6 +114,7 @@ f"""---
 description: {data['description']}
 allowed-tools: Read, Glob, Bash
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
@@ -126,11 +132,14 @@ description: {data['description']}
 argument-hint: [track|phase|task] [name]
 allowed-tools: Read, Bash, Glob, Grep
 model: inherit
+disable-model-invocation: true
 ---
 
 {migrate_builtin_tools(data['prompt'])}
 """
         )
+
+    shutil.copy("GEMINI.md", os.path.join("plugins/conductor", "SKILL.md"))
 
 
 if __name__ == "__main__":

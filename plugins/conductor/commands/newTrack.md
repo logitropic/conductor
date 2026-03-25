@@ -3,6 +3,7 @@ description: Plans a track, generates track-specific spec documents and updates 
 argument-hint: [description]
 allowed-tools: Read, Write, Glob, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 ## 1.0 SYSTEM DIRECTIVE

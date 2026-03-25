@@ -1,8 +1,9 @@
 ---
 description: Executes the tasks defined in the specified track's plan
-argument-hint: [<track-name>] [--all]
+argument-hint: [<track-name>]
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 ## 1.0 SYSTEM DIRECTIVE
@@ -224,4 +225,3 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
                 a. **Announce Cancellation:** Announce: "Deletion cancelled. The track has not been changed."
     *   **If user chooses "Skip":**
         *   Announce: "Okay, the completed track will remain in your tracks file for now."
-

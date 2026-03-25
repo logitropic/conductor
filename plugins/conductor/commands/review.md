@@ -2,6 +2,7 @@
 description: Reviews the completed track work against guidelines and the plan
 allowed-tools: Read, Glob, Bash
 model: inherit
+disable-model-invocation: true
 ---
 
 ## 1.0 SYSTEM DIRECTIVE

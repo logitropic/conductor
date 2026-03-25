@@ -3,6 +3,7 @@ description: Scaffolds the project and sets up the Conductor environment
 argument-hint: [project-type]
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 model: inherit
+disable-model-invocation: true
 ---
 
 ## 1.0 SYSTEM DIRECTIVE
@@ -289,7 +290,7 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
 ### 2.4 Select Guides (Interactive)
 1.  **Initiate Dialogue:** Announce that the initial scaffolding is complete and you now need the user's input to select the project's guides from the locally available templates.
 2.  **Select Code Style Guides:**
-    -   List the available style guides by using the `Bash` tool to execute `ls ~/.gemini/extensions/conductor/templates/code_styleguides/`. **CRITICAL: You MUST use `Bash` for this step. Do NOT use the `list_directory` tool, as the templates directory resides outside of your allowed workspace and the call will fail.**
+    -   List the available style guides by using the `Bash` tool to execute `ls ${CLAUDE_SKILL_DIR}/templates/code_styleguides/`. **CRITICAL: You MUST use `Bash` for this step. Do NOT use the `list_directory` tool, as the templates directory resides outside of your allowed workspace and the call will fail.**
     -   **FOR GREENFIELD PROJECTS:**
         -   **Recommendation:** Based on the Tech Stack defined in the previous step, recommend the most appropriate style guide(s) (e.g., "python.md" for a Python project) and explain why.
         -   **Determine Mode:** Use the `AskUserQuestion` tool:
@@ -326,12 +327,12 @@ CRITICAL: You must validate the success of every tool call. If a tool call fails
             -   **Action:** Announce "I'll present the additional guides. Please select all that apply." Then, immediately call the `AskUserQuestion` tool (do not list the questions in the chat).
             -   **Method:** Use a single `AskUserQuestion` tool call. Dynamically split the available guides into batches of 4 options max. Create one `multiSelect: true` question for each batch.
 
-3.  **Action:** Construct and execute a command to create the directory and copy all selected files. For example: `mkdir -p conductor/code_styleguides && cp ~/.gemini/extensions/conductor/templates/code_styleguides/python.md ~/.gemini/extensions/conductor/templates/code_styleguides/javascript.md conductor/code_styleguides/`
+3.  **Action:** Construct and execute a command to create the directory and copy all selected files. For example: `mkdir -p conductor/code_styleguides && cp ${CLAUDE_SKILL_DIR}/templates/code_styleguides/python.md ${CLAUDE_SKILL_DIR}/templates/code_styleguides/javascript.md conductor/code_styleguides/`
 4.  **Continue:** Immediately proceed to the next section.
 
 ### 2.5 Select Workflow (Interactive)
 1.  **Copy Initial Workflow:**
-    -   Copy `~/.gemini/extensions/conductor/templates/workflow.md` to `conductor/workflow.md`.
+    -   Copy `${CLAUDE_SKILL_DIR}/templates/workflow.md` to `conductor/workflow.md`.
 2.  **Determine Mode:** Use the `AskUserQuestion` tool to let the user choose their preferred workflow.
     - **questions:**
         - **header:** "Workflow"

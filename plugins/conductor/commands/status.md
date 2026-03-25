@@ -2,6 +2,7 @@
 description: Displays the current progress of the project
 allowed-tools: Read, Glob, Bash
 model: inherit
+disable-model-invocation: true
 ---
 
 ## 1.0 SYSTEM DIRECTIVE
@@ -57,5 +58,3 @@ CRITICAL: You must validate the success of every tool call. If any tool call fai
     -   **Phases (total):** The total number of major phases.
     -   **Tasks (total):** The total number of tasks.
     -   **Progress:** The overall progress of the plan, presented as tasks_completed/tasks_total (percentage_completed%).
-
-
